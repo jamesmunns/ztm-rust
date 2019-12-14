@@ -84,9 +84,9 @@ arm-none-eabi-objdump -Ct target/thumbv7em-none-eabihf/release/from-scratch | so
 00000004 g     O .vector_table  00000004 __RESET_VECTOR
 00000008 g       .vector_table  00000000 __reset_vector
 000000dc g       .vector_table  00000000 _stext
-000000dc l     F .text  00000092 from_scratch::reset_handler
-0000016e l     F .text  00000002 .hidden rust_begin_unwind
-00000170 l     F .text  00000362 from_scratch::main
+000000dc l     F .text  0000005c from_scratch::reset_handler
+00000138 l     F .text  00000072 from_scratch::main
+000001ac g       .text  00000000 __etext
 ...
 ```
 
@@ -337,11 +337,34 @@ Unlike Exceptions in C++, panics are usually not designed to be recovered from g
 
 Still, we must define a "panic handler" in case our program ever panics. For this example, we go into an endless loop, though you could choose to do something different, like logging the error to flash, or soft-rebooting the system immediately.
 
+### Programming without Compromise
 
+Earlier I mentioned that Rust brings convenience without compromise. To demonstrate this, let's take a quick look at size and total contents of our code once we compile for `opt-level = "s"`, which is equivalent to `-Os` in C or C++:
 
-# Unsorted notes
+```
+arm-none-eabi-size target/thumbv7em-none-eabihf/release/from-scratch
+   text    data     bss     dec     hex filename
+    420       0       8     428     1ac target/thumbv7em-none-eabihf/release/from-scratch
 
-* Original post
-    * https://interrupt.memfault.com/blog/zero-to-main-1
-* Linker script post
-    * https://interrupt.memfault.com/blog/how-to-write-linker-scripts-for-firmware
+arm-none-eabi-nm -nSC target/thumbv7em-none-eabihf/release/from-scratch
+00000004 00000004 R __RESET_VECTOR
+00000008 R __reset_vector
+000000dc R _stext
+000000dc 0000005c t from_scratch::reset_handler
+00000138 0000006a t from_scratch::main
+000001a4 T __erodata
+000001a4 T __etext
+000001a4 A __sidata
+20000000 T __edata
+20000000 B __sbss
+20000000 T __sdata
+20000000 00000004 b from_scratch::delay::DUMMY
+20000004 00000001 b from_scratch::nrf52::gpio::Pins::take::TAKEN
+20000008 B __ebss
+20000008 B __sheap
+20010000 A _stack_start
+```
+
+This is 420 bytes of `.text`, which boils down to 220 bytes for the vector table, and 198 bytes of actual code.
+
+<!-- TODO: Punchy finish -->
