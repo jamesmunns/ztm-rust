@@ -5,8 +5,7 @@
 //! and `nrf52832-hal` crates for idiomatic sources
 #![allow(dead_code)]
 
-
-// A not-very-safe abstraction of GPIOs in Rust
+// A not-very-useful abstraction of GPIOs in Rust
 pub mod gpio {
     use core::sync::atomic::{AtomicBool, Ordering::SeqCst};
 
@@ -37,40 +36,7 @@ pub mod gpio {
         High,
     }
 
-    const REG_P0_PIN_CNF: [*mut u32; 32] = [
-        0x5000_0700 as *mut u32,
-        0x5000_0704 as *mut u32,
-        0x5000_0708 as *mut u32,
-        0x5000_070C as *mut u32,
-        0x5000_0710 as *mut u32,
-        0x5000_0714 as *mut u32,
-        0x5000_0718 as *mut u32,
-        0x5000_071C as *mut u32,
-        0x5000_0720 as *mut u32,
-        0x5000_0724 as *mut u32,
-        0x5000_0728 as *mut u32,
-        0x5000_072C as *mut u32,
-        0x5000_0730 as *mut u32,
-        0x5000_0734 as *mut u32,
-        0x5000_0738 as *mut u32,
-        0x5000_073C as *mut u32,
-        0x5000_0740 as *mut u32,
-        0x5000_0744 as *mut u32,
-        0x5000_0748 as *mut u32,
-        0x5000_074C as *mut u32,
-        0x5000_0750 as *mut u32,
-        0x5000_0754 as *mut u32,
-        0x5000_0758 as *mut u32,
-        0x5000_075C as *mut u32,
-        0x5000_0760 as *mut u32,
-        0x5000_0764 as *mut u32,
-        0x5000_0768 as *mut u32,
-        0x5000_076C as *mut u32,
-        0x5000_0770 as *mut u32,
-        0x5000_0774 as *mut u32,
-        0x5000_0778 as *mut u32,
-        0x5000_077C as *mut u32,
-    ];
+    const REG_P0_PIN_CNF_BASE: *mut u32 = 0x5000_0700 as *mut u32;
     const REG_P0_OUT_SET: *mut u32 = 0x5000_0508 as *mut u32;
     const REG_P0_OUT_CLR: *mut u32 = 0x5000_050C as *mut u32;
 
@@ -96,7 +62,7 @@ pub mod gpio {
                 | PIN_CNF_SENSE_DISABLED;
 
             unsafe {
-                core::ptr::write_volatile(REG_P0_PIN_CNF[self.0 as usize], set_val);
+                core::ptr::write_volatile(REG_P0_PIN_CNF_BASE.offset(self.0 as isize), set_val);
             }
         }
 
