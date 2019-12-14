@@ -3,7 +3,16 @@
 
 use core::panic::PanicInfo;
 
-fn main() {
+#[link_section = ".vector_table.reset_vector"]
+#[no_mangle]
+pub static __RESET_VECTOR: unsafe extern "C" fn() -> ! = Reset;
+
+#[no_mangle]
+pub unsafe extern "C" fn Reset() -> ! {
+    main()
+}
+
+fn main() -> ! {
     loop {
         continue;
     }
