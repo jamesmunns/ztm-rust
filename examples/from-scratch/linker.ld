@@ -34,6 +34,18 @@ SECTIONS
     /* Reset vector */
     KEEP(*(.vector_table.reset_vector)); /* this is the `__RESET_VECTOR` symbol */
     __reset_vector = .;
+
+    /* Placeholder for other unused interrupts in the vector table.
+     * The nRF52 should roughly be:
+     *   * 0x000..=0x008 - SP, reset vector (above)
+     *   * 0x008..=0x040 - Exceptions
+     *   * 0x040..=0x0dc - Interrupts
+     *
+     * This doesn't actually PUT anything here, which would be bad
+     * if we ever used interrupts or hit a fault, which we don't,
+     * in our example.
+     */
+    . = 0x0dc;
   } > FLASH
 
   PROVIDE(_stext = ADDR(.vector_table) + SIZEOF(.vector_table));
