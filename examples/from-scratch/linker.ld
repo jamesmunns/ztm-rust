@@ -15,7 +15,7 @@ MEMORY
   RAM   : ORIGIN  = 0x20000000, LENGTH = 64K
 }
 
-ENTRY(Reset);
+ENTRY(reset);
 EXTERN(__RESET_VECTOR);
 
 /* ? */
