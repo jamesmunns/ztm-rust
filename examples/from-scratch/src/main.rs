@@ -2,12 +2,15 @@
 #![no_main]
 
 use core::{
+    mem::zeroed,
     panic::PanicInfo,
     ptr::{read, write_volatile},
 };
 
+mod nrf52;
+
 #[link_section = ".vector_table.reset_vector"]
-#[no_mangle]
+#[no_mangle]#[cfg(debug_assertions)]
 pub static __RESET_VECTOR: fn() -> ! = reset_handler;
 
 pub fn reset_handler() -> ! {
@@ -26,7 +29,7 @@ pub fn reset_handler() -> ! {
         let ebss: *mut u32 = &mut __ebss;
 
         while sbss < ebss {
-            write_volatile(sbss, core::mem::zeroed());
+            write_volatile(sbss, zeroed());
             sbss = sbss.offset(1);
         }
     }
@@ -49,8 +52,33 @@ pub fn reset_handler() -> ! {
 }
 
 fn main() -> ! {
+    use nrf52::gpio;
+
+    let mut led = gpio::P0_31;
+
+    led.set_push_pull_output(gpio::Level::Low);
+
     loop {
-        continue;
+        led.set_high();
+        delay(2_000_000);
+
+        led.set_low();
+        delay(6_000_000);
+    }
+}
+
+fn delay(ticks: usize) {
+    static mut DUMMY: usize = 0;
+
+    // Reduce the iterations when in debug mode
+    #[cfg(debug_assertions)]
+    let ticks = ticks / 100;
+
+    for t in 0..ticks {
+        // Prevent the optimizer from removing this loop
+        unsafe {
+            write_volatile(&mut DUMMY, t);
+        }
     }
 }
 
