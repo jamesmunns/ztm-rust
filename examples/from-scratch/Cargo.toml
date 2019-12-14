@@ -4,6 +4,15 @@ version = "0.1.0"
 authors = ["James Munns <james.munns@ferrous-systems.com>"]
 edition = "2018"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
 [dependencies]
+
+# Uncomment the following section to enable optimizations for size,
+# rather than the default optimization level of `3`.
+
+# [profile.release]
+# codegen-units   = 1
+# debug           = true
+# incremental     = false
+# lto             = true
+# opt-level       = 's'
+# panic           = "abort"

@@ -51,7 +51,7 @@ pub fn reset_handler() -> ! {
         }
     }
 
-    // Call user main
+    // Call user's main function
     main()
 }
 
@@ -61,6 +61,22 @@ fn panic(_info: &PanicInfo) -> ! {
     // On a panic, loop forever
     loop {
         continue;
+    }
+}
+
+// A short delay function
+fn delay(ticks: usize) {
+    static mut DUMMY: usize = 0;
+
+    // Reduce the number of iterations when in debug mode
+    #[cfg(debug_assertions)]
+    let ticks = ticks / 128;
+
+    for t in 0..ticks {
+        // Prevent the optimizer from removing this loop
+        unsafe {
+            write_volatile(&mut DUMMY, t);
+        }
     }
 }
 
@@ -84,20 +100,5 @@ fn main() -> ! {
 
         led.set_low();
         delay(6_000_000);
-    }
-}
-
-fn delay(ticks: usize) {
-    static mut DUMMY: usize = 0;
-
-    // Reduce the iterations when in debug mode
-    #[cfg(debug_assertions)]
-    let ticks = ticks / 100;
-
-    for t in 0..ticks {
-        // Prevent the optimizer from removing this loop
-        unsafe {
-            write_volatile(&mut DUMMY, t);
-        }
     }
 }
