@@ -1,12 +1,41 @@
+//! A basic simulation of a Rust driver for the nRF52.
+//!
+//! This is *not* meant to be a good example of how to write
+//! low level Rust drivers. Please refer to the `nrf52832-pac`
+//! and `nrf52832-hal` crates for idiomatic sources
 #![allow(dead_code)]
+
 
 // A not-very-safe abstraction of GPIOs in Rust
 pub mod gpio {
-    #[derive(Copy, Clone)]
+    use core::sync::atomic::{
+        AtomicBool,
+        Ordering::SeqCst,
+    };
+
+    /// A struct that represents an nRF52 Pin
     pub struct Pin(u8);
 
-    pub const P0_31: Pin = Pin(31);
+    /// A struct that represents P0 of the nRF52
+    pub struct Pins {
+        pub p0_31: Pin
+    }
 
+    impl Pins {
+        /// A function to obtain a Port 0 singleton structure
+        pub fn take() -> Self {
+            static TAKEN: AtomicBool = AtomicBool::new(false);
+
+            // Enforce this as a singleton
+            assert!(!TAKEN.swap(true, SeqCst));
+
+            Self {
+                p0_31: Pin(31),
+            }
+        }
+    }
+
+    /// The level of a GPIO
     #[derive(Copy, Clone)]
     pub enum Level {
         Low,
@@ -57,6 +86,7 @@ pub mod gpio {
     const PIN_CNF_SENSE_DISABLED: u32 = 0x0000_0000;
 
     impl Pin {
+        /// Set a pin to be a push pull output
         pub fn set_push_pull_output(&mut self, level: Level) {
             // set level
             match level {
@@ -75,10 +105,12 @@ pub mod gpio {
             }
         }
 
+        /// Set a pin to output level low
         pub fn set_low(&mut self) {
             unsafe { core::ptr::write_volatile(REG_P0_OUT_SET, 1 << (self.0 as u32)) }
         }
 
+        /// Set a pin to output level high
         pub fn set_high(&mut self) {
             unsafe { core::ptr::write_volatile(REG_P0_OUT_CLR, 1 << (self.0 as u32)) }
         }

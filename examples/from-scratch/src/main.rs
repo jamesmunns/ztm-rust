@@ -7,10 +7,14 @@ use core::{
     ptr::{read, write_volatile},
 };
 
-mod nrf52;
+// ----------------------------------------------------------------
+// This section contains the code regularly provided outside of
+// a Rust `main.rs` file. These items will usually be provided by
+// libraries, or "crates" in Rust.
+// ----------------------------------------------------------------
 
 #[link_section = ".vector_table.reset_vector"]
-#[no_mangle]#[cfg(debug_assertions)]
+#[no_mangle]
 pub static __RESET_VECTOR: fn() -> ! = reset_handler;
 
 pub fn reset_handler() -> ! {
@@ -51,10 +55,26 @@ pub fn reset_handler() -> ! {
     main()
 }
 
+/// This function is called on panic.
+#[panic_handler]
+fn panic(_info: &PanicInfo) -> ! {
+    // On a panic, loop forever
+    loop {
+        continue;
+    }
+}
+
+// ----------------------------------------------------------------
+// This section of code is typical for application code in Rust
+// ----------------------------------------------------------------
+
+mod nrf52;
+
 fn main() -> ! {
     use nrf52::gpio;
 
-    let mut led = gpio::P0_31;
+    let gpios = gpio::Pins::take();
+    let mut led = gpios.p0_31;
 
     led.set_push_pull_output(gpio::Level::Low);
 
@@ -79,14 +99,5 @@ fn delay(ticks: usize) {
         unsafe {
             write_volatile(&mut DUMMY, t);
         }
-    }
-}
-
-/// This function is called on panic.
-#[panic_handler]
-fn panic(_info: &PanicInfo) -> ! {
-    // On a panic, loop forever
-    loop {
-        continue;
     }
 }
