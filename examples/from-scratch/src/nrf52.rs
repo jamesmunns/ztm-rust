@@ -8,17 +8,14 @@
 
 // A not-very-safe abstraction of GPIOs in Rust
 pub mod gpio {
-    use core::sync::atomic::{
-        AtomicBool,
-        Ordering::SeqCst,
-    };
+    use core::sync::atomic::{AtomicBool, Ordering::SeqCst};
 
     /// A struct that represents an nRF52 Pin
     pub struct Pin(u8);
 
     /// A struct that represents P0 of the nRF52
     pub struct Pins {
-        pub p0_31: Pin
+        pub p0_31: Pin,
     }
 
     impl Pins {
@@ -29,9 +26,7 @@ pub mod gpio {
             // Enforce this as a singleton
             assert!(!TAKEN.swap(true, SeqCst));
 
-            Self {
-                p0_31: Pin(31),
-            }
+            Self { p0_31: Pin(31) }
         }
     }
 

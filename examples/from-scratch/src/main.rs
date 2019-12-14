@@ -86,13 +86,13 @@ fn delay(ticks: usize) {
 
 mod nrf52;
 
-fn main() -> ! {
-    use nrf52::gpio;
+use nrf52::gpio::{Level, Pins};
 
-    let gpios = gpio::Pins::take();
+fn main() -> ! {
+    let gpios = Pins::take();
     let mut led = gpios.p0_31;
 
-    led.set_push_pull_output(gpio::Level::Low);
+    led.set_push_pull_output(Level::Low);
 
     loop {
         led.set_high();
