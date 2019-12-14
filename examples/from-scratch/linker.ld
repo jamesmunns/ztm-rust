@@ -15,7 +15,6 @@ MEMORY
   RAM   : ORIGIN  = 0x20000000, LENGTH = 64K
 }
 
-ENTRY(reset);
 EXTERN(__RESET_VECTOR);
 
 /* ? */
@@ -35,13 +34,6 @@ SECTIONS
     /* Reset vector */
     KEEP(*(.vector_table.reset_vector)); /* this is the `__RESET_VECTOR` symbol */
     __reset_vector = .;
-
-    /* Exceptions */
-    KEEP(*(.vector_table.exceptions)); /* this is the `__EXCEPTIONS` symbol */
-    __eexceptions = .;
-
-    /* Device specific interrupts */
-    KEEP(*(.vector_table.interrupts)); /* this is the `__INTERRUPTS` symbol */
   } > FLASH
 
   PROVIDE(_stext = ADDR(.vector_table) + SIZEOF(.vector_table));
@@ -50,8 +42,6 @@ SECTIONS
   .text _stext :
   {
     *(.text .text.*);
-    *(.HardFaultTrampoline);
-    *(.HardFault.*);
     . = ALIGN(4);
     __etext = .;
   } > FLASH
@@ -103,14 +93,6 @@ SECTIONS
   /* Place the heap right after `.uninit` */
   . = ALIGN(4);
   __sheap = .;
-
-  /* ## .got */
-  /* Dynamic relocations are unsupported. This section is only used to detect relocatable code in
-     the input files and raise an error if relocatable code is found */
-  .got (NOLOAD) :
-  {
-    KEEP(*(.got .got.*));
-  }
 
   /* ## Discarded sections */
   /DISCARD/ :

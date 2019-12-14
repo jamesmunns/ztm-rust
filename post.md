@@ -1,6 +1,6 @@
 # From zero to main(): Bare metal Rust
 
-<!-- TODO: A brief mention of Rust -->
+<!-- TODO: A brief mention of Rust and the previous post -->
 
 ## Setting the stage
 
