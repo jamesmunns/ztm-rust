@@ -4,10 +4,6 @@ For the past thirty years or so, the choices of languages for embedded systems d
 
 But not for no reason! Languages often make trade-offs to fit the needs of the developers working with them: an interpreter to allow for rapid iteration, a heap for ease of memory management, exceptions for simplifying control flow, etc. But these trade-offs come with a price: whether it is code size, RAM usage, low level control, power usage, latency, or determinism.
 
-When you're working with a system with 8K of Flash, and 2K of RAM, you can't "afford" nice things, right?
-
-I disagree.
-
 Since 2015, Rust has been redefining what it means to combine the best-in-class aspects of performance, correctness, and developer convenience into one language, without compromise.
 
 As a compiled systems language (based on LLVM), it is also capable of reaching down to the lowest levels of embedded programming as well, without losing built-in features that feel more at home in higher level languages, like a package manager, helpful compile time diagnostics, correctness through powerful static analysis, or documentation tooling.
